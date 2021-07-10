@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1058239497764",
+    "project_id": "hashgenerator",
+    "storage_bucket": "hashgenerator.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1058239497764:android:0c6e9289e576ca2c8b3ab1",
+        "android_client_info": {
+          "package_name": "com.example.hashgenerator"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1058239497764-8vi71l5b4m075vpr6gjm7qulehu3les4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAa_ZcI-shkKsf6eLHDknNAKpGzR2B3AH4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1058239497764-8vi71l5b4m075vpr6gjm7qulehu3les4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
