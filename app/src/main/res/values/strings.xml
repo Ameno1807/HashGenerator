@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">HashGenerator</string>
+    <string name="delete_text">Удалить весь хэш-список</string>
 </resources>

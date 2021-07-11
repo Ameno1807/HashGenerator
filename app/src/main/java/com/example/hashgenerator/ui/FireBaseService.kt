@@ -1,11 +1,12 @@
-package com.example.hashgenerator
+package com.example.hashgenerator.ui
 
 import android.content.Intent
 import android.util.Log
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
-class FireBaseService : FirebaseMessagingService() {
+
+class FireBaseService : FirebaseMessagingService(){
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
@@ -16,15 +17,16 @@ class FireBaseService : FirebaseMessagingService() {
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
 
-        val intent = Intent(INTENT_FILTER)
-        remoteMessage.data.forEach { entity ->
-            intent.putExtra(entity.key, entity.value)
-        }
+            val intent = Intent(INTENT_FILTER)
+            remoteMessage.data.forEach { entity ->
+                intent.putExtra(entity.key, entity.value)
+            }
         startActivity(intent)
     }
 
     companion object {
         const val INTENT_FILTER = "INTENT"
         const val KEY_MESSAGE = "body"
+        const val MESSAGE_ID = "id"
     }
 }

@@ -1,34 +1,49 @@
-package com.example.hashgenerator
+package com.example.hashgenerator.ui
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import androidx.activity.viewModels
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.hashgenerator.data.model.HashModel
 import com.example.hashgenerator.databinding.ActivityMainBinding
+import com.example.hashgenerator.ui.viewModel.HashViewModel
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 import java.security.MessageDigest
 
+
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private lateinit var list: MutableList<HashModel>
+    private var messageId = intent?.extras?.getString(FireBaseService.MESSAGE_ID)
+    private val hashViewModel: HashViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        var list1 = arrayListOf(HashModel("toHash: ${intent?.extras?.getString(FireBaseService.KEY_MESSAGE)}, hash value: ${generateHash()}"))
-        list = list1.toMutableList()
+        insertData()
 
+        binding.button.setOnClickListener {
+            hashViewModel.deleteHash()
+        }
 
         binding.recyclerView.apply {
             this.layoutManager = LinearLayoutManager(this.context, LinearLayoutManager.VERTICAL, false)
             val adapter = MainAdapter()
             this.adapter = adapter
-            adapter.submitList(list)
+            hashViewModel.readAllData.observe(this@MainActivity, Observer { hash ->
+                adapter.setData(hash)
+            })
         }
+    }
+
+    private fun insertData() {
+        val hash = HashModel(messageId?.toInt(),intent?.extras?.getString(FireBaseService.KEY_MESSAGE), generateHash())
+        hashViewModel.addHash(hash)
     }
 
 
