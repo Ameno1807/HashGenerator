@@ -13,7 +13,8 @@ interface HashDao {
     @Query("SELECT * FROM hash_table ORDER BY id ASC")
     fun readAllData(): LiveData<List<HashModel>>
 
-    @Query("DELETE FROM hash_table")
+    @Query("DELETE FROM hash_table ")
     suspend fun deleteHash()
+
 
 }

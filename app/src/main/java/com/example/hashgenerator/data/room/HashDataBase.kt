@@ -6,7 +6,6 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.hashgenerator.data.model.HashModel
 
-
 @Database(entities = [HashModel::class], version = 1, exportSchema = false)
 abstract class HashDataBase : RoomDatabase() {
 
