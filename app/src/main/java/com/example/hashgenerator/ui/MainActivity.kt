@@ -1,6 +1,12 @@
 package com.example.hashgenerator.ui
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.nfc.Tag
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -13,19 +19,25 @@ import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 
 
-
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private var messageId = intent?.extras?.getString(FireBaseService.MESSAGE_ID)
     private val hashViewModel: HashViewModel by viewModels()
+    private lateinit var pushBroadcastReceiver: BroadcastReceiver
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+
+        val shared = getSharedPreferences("count_key", MODE_PRIVATE)
+        shared.edit().clear().apply()
+
+
         insertData()
+        fireBase()
 
         binding.button.setOnClickListener {
             hashViewModel.deleteHash()
@@ -42,23 +54,24 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun insertData() {
-        val hash = HashModel(
-            messageId?.toInt(),
-            intent?.extras?.getString(FireBaseService.KEY_MESSAGE),
-            generateHash()
-        )
+        pushBroadcastReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                val bundle = intent?.extras
+                val text = bundle?.getString(FireBaseService.KEY_MESSAGE)
+                val hash1 = getHash(text.toString())
 
-        if (intent?.extras?.getString(FireBaseService.KEY_MESSAGE) != null) {
-            hashViewModel.addHash(hash)
-        } else Log.e("Tag", "Уведомление null")
-    }
-
-
-    private fun generateHash(): String {
-        fireBase()
-            val bundle = intent.extras
-            val text = bundle?.getString(FireBaseService.KEY_MESSAGE)
-            return getHash(text.toString())
+                val hash = HashModel(
+                    null,
+                    text,
+                    hash1
+                )
+                hashViewModel.addHash(hash)
+                Log.e("Tag", "Hash -> $hash")
+            }
+        }
+        val intentFilter = IntentFilter()
+        intentFilter.addAction(FireBaseService.INTENT_FILTER)
+        registerReceiver(pushBroadcastReceiver, intentFilter)
     }
 
     private fun fireBase() {
@@ -73,5 +86,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun getHash(body: String): String {
         return hashViewModel.hashGenerate(body)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceiver(pushBroadcastReceiver)
     }
 }

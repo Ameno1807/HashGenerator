@@ -7,6 +7,8 @@ import android.content.Intent
 import android.content.Intent.*
 import android.graphics.BitmapFactory
 import android.os.Build
+import android.preference.PreferenceManager
+import android.preference.PreferenceManager.getDefaultSharedPreferences
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
@@ -30,16 +32,13 @@ class FireBaseService : FirebaseMessagingService() {
             createNotificationChannel()
         }
 
-        if (remoteMessage.notification != null) {
-            showNotification(remoteMessage.notification!!.title, remoteMessage.notification!!.body)
-            val intent = Intent(this, MainActivity::class.java)
-            intent.addFlags(FLAG_ACTIVITY_NEW_TASK)
-            remoteMessage.data.forEach { entity ->
-                    intent.putExtra(entity.key, entity.value)
-                    startActivity(intent)
-            }
-            Log.e("Tag", "Token -> $intent")
+        showNotification()
+        val intent = Intent(INTENT_FILTER)
+        remoteMessage.data.forEach { entity ->
+            intent.putExtra(entity.key, entity.value)
         }
+        sendBroadcast(intent)
+        Log.e("Tag", "Body -> ${remoteMessage.data["body"]}")
 
     }
 
@@ -56,15 +55,22 @@ class FireBaseService : FirebaseMessagingService() {
     }
 
 
-    private fun showNotification(title: String?, body: String?) {
+    private fun showNotification() {
+
+
         val notificationManager =
             applicationContext.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-        val intent = Intent(this, MainActivity::class.java)
+        val intent = Intent(applicationContext, MainActivity::class.java)
+
+        val prefs = getSharedPreferences("count_key", MODE_PRIVATE)
+        var count = prefs.getInt("count_key", 0)
+
+        count += 1
 
         val builder: NotificationCompat.Builder =
             NotificationCompat.Builder(applicationContext, "channel_id")
-                .setContentTitle(title)
-                .setContentText(body)
+                .setContentTitle("Hash")
+                .setContentText("Произведено $count вычисление")
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setLargeIcon(BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher))
                 .setAutoCancel(true)
@@ -73,14 +79,19 @@ class FireBaseService : FirebaseMessagingService() {
                         applicationContext,
                         0,
                         intent,
-                        PendingIntent.FLAG_UPDATE_CURRENT
+                        0
                     )
                 )
-        notificationManager.notify(1, builder.build())
+        notificationManager.notify(0, builder.build())
+
+        val editor = prefs.edit()
+        editor.putInt("count_key", count)
+        editor.apply()
+
     }
 
-
     companion object {
+        const val INTENT_FILTER = "PUSH_EVENT"
         const val KEY_MESSAGE = "body"
         const val MESSAGE_ID = "id"
     }

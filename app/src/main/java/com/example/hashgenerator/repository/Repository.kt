@@ -18,6 +18,4 @@ class Repository (
         hashDao.deleteHash()
     }
 
-
-
 }

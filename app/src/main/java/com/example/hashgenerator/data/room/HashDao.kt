@@ -16,5 +16,4 @@ interface HashDao {
     @Query("DELETE FROM hash_table ")
     suspend fun deleteHash()
 
-
 }
