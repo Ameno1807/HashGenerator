@@ -5,6 +5,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Intent
 import android.content.Intent.*
+import android.content.SharedPreferences
 import android.graphics.BitmapFactory
 import android.os.Build
 import android.preference.PreferenceManager
@@ -32,7 +33,17 @@ class FireBaseService : FirebaseMessagingService() {
             createNotificationChannel()
         }
 
-        showNotification()
+        /*val prefs = getSharedPreferences("count_key", MODE_PRIVATE)
+        var count = prefs.getInt("count_key", 0)
+
+        count += 1*/
+
+        showNotification(remoteMessage.data["body"])
+
+       /* val editor = prefs.edit()
+        editor.putInt("count_key", count)
+        editor.apply()*/
+
         val intent = Intent(INTENT_FILTER)
         remoteMessage.data.forEach { entity ->
             intent.putExtra(entity.key, entity.value)
@@ -55,22 +66,19 @@ class FireBaseService : FirebaseMessagingService() {
     }
 
 
-    private fun showNotification() {
+    private fun showNotification(body: String?) {
 
 
         val notificationManager =
             applicationContext.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         val intent = Intent(applicationContext, MainActivity::class.java)
 
-        val prefs = getSharedPreferences("count_key", MODE_PRIVATE)
-        var count = prefs.getInt("count_key", 0)
 
-        count += 1
 
         val builder: NotificationCompat.Builder =
             NotificationCompat.Builder(applicationContext, "channel_id")
                 .setContentTitle("Hash")
-                .setContentText("Произведено $count вычисление")
+                .setContentText(body)
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setLargeIcon(BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher))
                 .setAutoCancel(true)
@@ -79,14 +87,12 @@ class FireBaseService : FirebaseMessagingService() {
                         applicationContext,
                         0,
                         intent,
-                        0
+                        PendingIntent.FLAG_UPDATE_CURRENT
                     )
                 )
         notificationManager.notify(0, builder.build())
 
-        val editor = prefs.edit()
-        editor.putInt("count_key", count)
-        editor.apply()
+
 
     }
 

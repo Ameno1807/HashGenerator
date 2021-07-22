@@ -31,10 +31,8 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-
-        val shared = getSharedPreferences("count_key", MODE_PRIVATE)
-        shared.edit().clear().apply()
-
+       /* val shared = getSharedPreferences("count_key", MODE_PRIVATE)
+        shared.edit().clear().apply()*/
 
         insertData()
         fireBase()
